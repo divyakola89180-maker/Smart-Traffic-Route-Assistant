@@ -1,0 +1,2920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartRoute</title>
+
+  <style>
+    :root {
+      --blue: #1976f3;
+      --blue-dark: #0a4da2;
+      --green: #16a34a;
+      --red: #dc2626;
+      --orange: #f59e0b;
+      --bg: #f3f7fc;
+      --card: #ffffff;
+      --text: #16263d;
+      --muted: #64748b;
+      --border: #d9e3ef;
+      --shadow: 0 8px 25px rgba(15, 35, 60, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .page {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      border: 0;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary-btn {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .primary-btn:hover {
+      background: var(--blue-dark);
+    }
+
+    .secondary-btn {
+      color: var(--blue);
+      background: #eaf2ff;
+      border: 1px solid #cfe1ff;
+    }
+
+    .danger-btn {
+      color: #fff;
+      background: var(--red);
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 12px;
+    }
+
+    /* Splash */
+    #splash {
+      z-index: 4000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(140deg, #edf6ff, #fff 52%, #dcecff);
+    }
+
+    .logo-circle {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 18px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 46px;
+      background: linear-gradient(145deg, #2988ff, #0b4cab);
+      box-shadow: 0 16px 34px rgba(25, 118, 243, 0.35);
+    }
+
+    #splash h1 {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: 38px;
+    }
+
+    #splash p {
+      margin: 10px 0 22px;
+      color: var(--muted);
+    }
+
+    .loader {
+      width: 42px;
+      height: 42px;
+      margin: auto;
+      border: 5px solid #d6e8ff;
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Login / signup */
+    .auth-wrap {
+      min-height: 100%;
+      padding: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #edf6ff, #fff);
+    }
+
+    .auth-card {
+      width: min(430px, 100%);
+      padding: 28px;
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .brand-name {
+      font-size: 29px;
+      font-weight: 800;
+      color: var(--blue-dark);
+    }
+
+    .auth-card h2 {
+      margin: 22px 0 5px;
+    }
+
+    .form-group {
+      margin: 14px 0;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(25, 118, 243, 0.12);
+    }
+
+    .auth-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .switch-auth {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .text-link {
+      color: var(--blue);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Language page */
+    #language-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(140deg, #eef6ff, #fff);
+    }
+
+    .language-card {
+      width: min(460px, 92vw);
+      padding: 30px;
+      border-radius: 25px;
+      text-align: center;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .language-card h1 {
+      margin: 0 0 8px;
+      color: var(--blue-dark);
+    }
+
+    .language-grid {
+      display: grid;
+      gap: 12px;
+      margin: 23px 0;
+    }
+
+    .language-option {
+      padding: 16px;
+      border: 2px solid #dbeafe;
+      border-radius: 16px;
+      color: var(--text);
+      background: #fff;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .language-option.selected {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: #eef6ff;
+    }
+
+    /* Main App */
+    #app {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    #map {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #topbar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .top-pill,
+    .icon-btn {
+      pointer-events: auto;
+      border: 0;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.14);
+    }
+
+    .top-pill {
+      max-width: 180px;
+      padding: 10px 13px;
+      border-radius: 14px;
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 800;
+    }
+
+    .top-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      font-size: 18px;
+    }
+
+    /* Source / destination card */
+    #search-panel {
+      position: absolute;
+      z-index: 20;
+      top: 68px;
+      left: 12px;
+      right: 12px;
+      width: min(560px, calc(100% - 24px));
+    }
+
+    .search-card {
+      padding: 12px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .location-row {
+      display: grid;
+      grid-template-columns: 25px 1fr 35px;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 2px;
+    }
+
+    .location-dot {
+      width: 12px;
+      height: 12px;
+      margin: auto;
+      border-radius: 50%;
+    }
+
+    .from-dot {
+      background: var(--blue);
+    }
+
+    .to-dot {
+      background: var(--red);
+    }
+
+    .location-row input {
+      width: 100%;
+      min-width: 0;
+      padding: 9px 2px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 15px;
+    }
+
+    .swap-btn {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      color: var(--blue);
+      background: #edf5ff;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .search-divider {
+      height: 1px;
+      margin: 2px 0;
+      background: #e7edf5;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 9px;
+      border-top: 1px solid #edf1f6;
+    }
+
+    .chip {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #f8fbff;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .chip select {
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 12px;
+    }
+
+    #find-routes {
+      margin-left: auto;
+      padding: 10px 15px;
+    }
+
+    /* Route Cards */
+    #route-panel {
+      position: absolute;
+      z-index: 18;
+      top: 245px;
+      left: 12px;
+      width: min(370px, calc(100% - 24px));
+      max-height: calc(100vh - 338px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .route-card {
+      padding: 13px;
+      border: 2px solid transparent;
+      border-radius: 17px;
+      background: #fff;
+      box-shadow: 0 5px 16px rgba(18, 38, 63, 0.14);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .route-card.active {
+      border-color: var(--blue);
+      box-shadow: 0 7px 20px rgba(25, 118, 243, 0.28);
+    }
+
+    .route-card.dimmed {
+      opacity: 0.62;
+    }
+
+    .route-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .route-name {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .recommend-badge {
+      padding: 4px 7px;
+      border-radius: 12px;
+      color: var(--blue);
+      background: #e7f0ff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .route-main {
+      margin: 8px 0 4px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .route-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .weather-summary {
+      margin-top: 9px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      background: #f5f9ff;
+      font-size: 12px;
+    }
+
+    .weather-icon {
+      display: inline-block;
+      margin-right: 6px;
+      font-size: 19px;
+    }
+
+    .sun-anim {
+      animation: spin 4s linear infinite;
+    }
+
+    .cloud-anim {
+      animation: float 2.2s ease-in-out infinite;
+    }
+
+    .rain-anim {
+      animation: rain 0.8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes rain {
+      50% { transform: translateY(3px); }
+    }
+
+    /* Map controls */
+    #map-controls {
+      position: absolute;
+      z-index: 20;
+      top: 80px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #sos-btn {
+      position: absolute;
+      z-index: 30;
+      right: 15px;
+      bottom: 90px;
+      padding: 13px 16px;
+      border: 0;
+      border-radius: 24px;
+      color: #fff;
+      background: var(--red);
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.36);
+      font-weight: 800;
+    }
+
+    /* Details sheet */
+    #details-sheet {
+      position: absolute;
+      z-index: 22;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      max-height: 75vh;
+      overflow-y: auto;
+      border-radius: 25px 25px 0 0;
+      background: #fff;
+      box-shadow: 0 -8px 28px rgba(18, 38, 63, 0.18);
+      transform: translateY(71%);
+      transition: transform 0.32s ease;
+    }
+
+    #details-sheet.open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 42px;
+      height: 5px;
+      margin: 10px auto;
+      border-radius: 9px;
+      background: #d6dce6;
+    }
+
+    .sheet-content {
+      padding: 0 18px 22px;
+    }
+
+    .sheet-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .sheet-title-row h3 {
+      margin: 3px 0 8px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .stat-box {
+      padding: 11px;
+      border-radius: 13px;
+      background: #f6f8fc;
+    }
+
+    .stat-box span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .stat-box b {
+      display: block;
+      margin-top: 4px;
+      font-size: 15px;
+    }
+
+    .alert-box {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0;
+      padding: 10px;
+      border-left: 4px solid var(--orange);
+      border-radius: 9px;
+      background: #fff7e5;
+      font-size: 13px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin: 13px 0;
+    }
+
+    .poi-section {
+      margin-top: 17px;
+    }
+
+    .poi-title {
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .poi-list {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .poi-card {
+      flex: 0 0 160px;
+      padding: 10px;
+      border: 1px solid #e3e9f2;
+      border-radius: 12px;
+      background: #f7f9fc;
+      font-size: 12px;
+    }
+
+    .poi-card b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .poi-card button {
+      margin-top: 7px;
+      padding: 5px 7px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--blue);
+      background: #e7f0ff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Bottom nav */
+    #bottom-nav {
+      position: absolute;
+      z-index: 35;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      background: #fff;
+      box-shadow: 0 -2px 13px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      align-items: center;
+      padding: 6px 13px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+    }
+
+    .nav-item span:first-child {
+      font-size: 20px;
+    }
+
+    .nav-item.active {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    /* Navigation mode */
+    #navigation-panel {
+      position: absolute;
+      z-index: 40;
+      top: 12px;
+      right: 12px;
+      left: 12px;
+      display: none;
+      padding: 13px;
+      border-radius: 17px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    #navigation-panel.active {
+      display: block;
+    }
+
+    .nav-instruction {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .turn-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      color: var(--blue);
+      background: #e8f1ff;
+      font-size: 28px;
+    }
+
+    .nav-info b {
+      display: block;
+      font-size: 15px;
+    }
+
+    .nav-summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .end-nav-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      border: 0;
+      border-radius: 10px;
+      color: #b91c1c;
+      background: #fee2e2;
+      font-weight: 800;
+    }
+
+    body.navigation-active #search-panel,
+    body.navigation-active #route-panel,
+    body.navigation-active #details-sheet,
+    body.navigation-active #bottom-nav {
+      display: none;
+    }
+
+    body.navigation-active #sos-btn {
+      bottom: 18px;
+    }
+
+    /* Modal */
+    #modal-backdrop {
+      position: fixed;
+      z-index: 2500;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .modal {
+      width: min(640px, 100%);
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 20px;
+      border-radius: 26px 26px 0 0;
+      background: #fff;
+    }
+
+    .modal h2 {
+      margin: 4px 0 9px;
+    }
+
+    .close-modal {
+      float: right;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: #edf2f9;
+      font-size: 18px;
+    }
+
+    .list-item {
+      margin: 10px 0;
+      padding: 12px;
+      border: 1px solid #e5eaf1;
+      border-radius: 13px;
+      background: #f7f9fc;
+      font-size: 13px;
+    }
+
+    .list-item b {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .line-btn {
+      margin: 8px 8px 0 0;
+      padding: 0;
+      border: 0;
+      color: var(--blue);
+      background: transparent;
+      font-weight: 800;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #e9eef5;
+      font-size: 14px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      z-index: 6000;
+      bottom: 78px;
+      left: 50%;
+      display: none;
+      max-width: calc(100vw - 32px);
+      padding: 11px 15px;
+      border-radius: 20px;
+      color: #fff;
+      background: #18263b;
+      box-shadow: var(--shadow);
+      transform: translateX(-50%);
+      font-size: 13px;
+    }
+
+    #toast.show {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      #route-panel {
+        max-height: 208px;
+      }
+
+      .filter-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .filter-row .chip:last-of-type,
+      #find-routes {
+        grid-column: span 2;
+      }
+
+      #find-routes {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Splash screen -->
+  <section id="splash" class="page">
+    <div>
+      <div class="logo-circle">🧭</div>
+      <h1>SmartRoute</h1>
+      <p>Smart travel. Safer routes.</p>
+      <div class="loader"></div>
+    </div>
+  </section>
+
+  <!-- Login / Signup screen -->
+  <section id="auth-page" class="page hidden">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="brand-name">🧭 SmartRoute</div>
+        <p class="muted small">Plan, compare and navigate smarter.</p>
+
+        <div id="login-form">
+          <h2>Welcome back</h2>
+          <p class="muted small">Login to access your trips and saved routes.</p>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input id="login-email" type="email" placeholder="Enter your email" />
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <input id="login-password" type="password" placeholder="Enter your password" />
+          </div>
+
+          <div class="auth-actions">
+            <button class="primary-btn full" onclick="loginUser()">Login</button>
+            <button class="secondary-btn full" onclick="continueAsGuest()">Continue as Guest</button>
+          </div>
+
+          <div class="switch-auth">
+            New user?
+            <span class="text-link" onclick="showSignup()">Create account</span>
+          </div>
+        </div>
+
+        <div id="signup-form" class="hidden">
+          <h2>Create account</h2>
+          <p class="muted small">Demo account: data is saved only in this browser.</p>
+
+          <div class="form-group">
+            <label>Full name</label>
+            <input id="signup-name" placeholder="Enter your name" />
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input id="signup-email" type="email" placeholder="Enter your email" />
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <input id="signup-password" type="password" placeholder="Create a password" />
+          </div>
+
+          <div class="auth-actions">
+            <button class="primary-btn full" onclick="signupUser()">Create account</button>
+          </div>
+
+          <div class="switch-auth">
+            Already have an account?
+            <span class="text-link" onclick="showLogin()">Login</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Language screen -->
+  <section id="language-page" class="page hidden">
+    <div class="language-card">
+      <div class="logo-circle" style="width:70px;height:70px;border-radius:21px;font-size:32px">🌐</div>
+      <h1>Select your language</h1>
+      <p class="muted">Choose the language for SmartRoute.</p>
+
+      <div class="language-grid">
+        <button class="language-option selected" data-language="en" onclick="chooseLanguage('en')">English</button>
+        <button class="language-option" data-language="te" onclick="chooseLanguage('te')">తెలుగు</button>
+        <button class="language-option" data-language="hi" onclick="chooseLanguage('hi')">हिन्दी</button>
+      </div>
+
+      <button class="primary-btn full" onclick="confirmLanguage()">Continue</button>
+    </div>
+  </section>
+
+  <!-- Main Application -->
+  <main id="app" class="hidden">
+    <div id="map"></div>
+
+    <div id="topbar">
+      <button class="top-pill" onclick="openProfile()">
+        <span>👤</span>
+        <span id="welcome-name">Hi, Guest</span>
+      </button>
+
+      <div class="top-right">
+        <button class="icon-btn" onclick="showToast('No new notifications')" title="Notifications">🔔</button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+      </div>
+    </div>
+
+    <!-- User enters source and destination here -->
+    <section id="search-panel">
+      <div class="search-card">
+        <div class="location-row">
+          <div class="location-dot from-dot"></div>
+          <input id="origin-input" placeholder="Enter starting location / source" />
+          <button class="swap-btn" onclick="swapLocations()" title="Swap source and destination">⇅</button>
+        </div>
+
+        <div class="search-divider"></div>
+
+        <div class="location-row">
+          <div class="location-dot to-dot"></div>
+          <input id="destination-input" placeholder="Enter destination" />
+          <button class="swap-btn" onclick="startVoiceSearch('destination')" title="Voice destination">🎤</button>
+        </div>
+
+        <div class="filter-row">
+          <label class="chip">
+            <input id="avoid-tolls" type="checkbox" />
+            Avoid tolls
+          </label>
+
+          <label class="chip">
+            <input id="avoid-highways" type="checkbox" />
+            Avoid highways
+          </label>
+
+          <label class="chip">
+            Vehicle:
+            <select id="vehicle-type" onchange="refreshRouteDetails()">
+              <option value="car">Car</option>
+              <option value="bike">Bike</option>
+              <option value="ev">EV</option>
+            </select>
+          </label>
+
+          <button id="find-routes" class="primary-btn" onclick="calculateRoutes()">Find routes</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Multiple route cards appear here -->
+    <section id="route-panel"></section>
+
+    <!-- Map controls -->
+    <div id="map-controls">
+      <button class="icon-btn" onclick="goToMyLocation()" title="My location">📍</button>
+      <button class="icon-btn" onclick="toggleTraffic()" title="Traffic">🚦</button>
+      <button class="icon-btn" onclick="toggleSatellite()" title="Satellite or roadmap">🛰️</button>
+      <button class="icon-btn" onclick="toggleDarkMap()" title="Dark map">🌙</button>
+      <button class="icon-btn" onclick="startVoiceSearch('origin')" title="Voice source">🎙️</button>
+    </div>
+
+    <button id="sos-btn" onclick="triggerSOS()">🆘 SOS</button>
+
+    <!-- Selected route detail sheet -->
+    <section id="details-sheet">
+      <div class="sheet-handle" onclick="toggleDetailsSheet()"></div>
+
+      <div class="sheet-content">
+        <div class="sheet-title-row">
+          <h3 id="selected-route-title">Select a route</h3>
+          <button class="secondary-btn" style="padding:7px 10px" onclick="toggleDetailsSheet()">Details</button>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-box">
+            <span>Road score</span>
+            <b id="road-score">--</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Safety score</span>
+            <b id="safety-score">--</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Fuel / energy estimate</span>
+            <b id="fuel-cost">--</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Toll estimate</span>
+            <b id="toll-info">--</b>
+          </div>
+        </div>
+
+        <div id="weather-alert" class="alert-box hidden">
+          <span id="weather-alert-icon">🌧️</span>
+          <div>
+            <b>Weather alert</b>
+            <div id="weather-alert-text">Check weather before travelling.</div>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="secondary-btn" onclick="shareRoute()">Share route</button>
+          <button class="secondary-btn" onclick="saveCurrentRoute()">Save route</button>
+        </div>
+
+        <button id="continue-btn" class="primary-btn full" onclick="openRouteReview()" disabled>
+          Continue
+        </button>
+
+        <div class="poi-section">
+          <div class="poi-title">🏥 Nearby hospitals</div>
+          <div id="poi-hospitals" class="poi-list"></div>
+        </div>
+
+        <div class="poi-section">
+          <div class="poi-title">⛽ Petrol pumps and EV charging</div>
+          <div id="poi-fuel" class="poi-list"></div>
+        </div>
+
+        <div class="poi-section">
+          <div class="poi-title">🍛 Restaurants and rest stops</div>
+          <div id="poi-restaurants" class="poi-list"></div>
+        </div>
+
+        <div class="poi-section">
+          <div class="poi-title">🔧 Mechanics</div>
+          <div id="poi-mechanics" class="poi-list"></div>
+        </div>
+
+        <div class="poi-section">
+          <div class="poi-title">🏧 ATMs</div>
+          <div id="poi-atms" class="poi-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation mode panel -->
+    <section id="navigation-panel">
+      <div class="nav-instruction">
+        <div class="turn-icon">↗</div>
+        <div class="nav-info">
+          <b id="navigation-instruction">Follow the highlighted route</b>
+          <span id="navigation-next-distance" class="muted small">Navigation is starting...</span>
+        </div>
+      </div>
+
+      <div class="nav-summary">
+        <span id="navigation-eta">ETA --</span>
+        <span id="navigation-distance">-- remaining</span>
+        <span id="navigation-speed">Speed --</span>
+      </div>
+
+      <button class="end-nav-btn" onclick="endNavigation(false)">End navigation</button>
+    </section>
+
+    <!-- Bottom navigation -->
+    <nav id="bottom-nav">
+      <button class="nav-item active" onclick="goHome()">
+        <span>🏠</span>
+        <span>Home</span>
+      </button>
+
+      <button class="nav-item" onclick="openTrips()">
+        <span>🧳</span>
+        <span>Trips</span>
+      </button>
+
+      <button class="nav-item" onclick="openSavedRoutes()">
+        <span>🔖</span>
+        <span>Saved</span>
+      </button>
+
+      <button class="nav-item" onclick="openProfile()">
+        <span>👤</span>
+        <span>Profile</span>
+      </button>
+    </nav>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal-backdrop" class="hidden">
+    <div id="modal-content" class="modal"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    /* =========================================================
+       APPLICATION STATE
+       ========================================================= */
+
+    const textByLanguage = {
+      en: {
+        selectRoute: "Select a route",
+        fastest: "Fastest route",
+        shortest: "Shortest route",
+        cheapest: "Cheapest route",
+        recommended: "Recommended",
+        routeReview: "Route review",
+        startNavigation: "Start navigation",
+        arrival: "You have arrived at your destination!",
+        networkError: "Route could not be found. Check locations and internet connection.",
+        locationDenied: "Location access was not granted. You can still enter source and destination manually."
+      },
+
+      te: {
+        selectRoute: "ఒక రూట్ ఎంచుకోండి",
+        fastest: "త్వరిత రూట్",
+        shortest: "తక్కువ దూరం రూట్",
+        cheapest: "తక్కువ ఖర్చు రూట్",
+        recommended: "సిఫార్సు",
+        routeReview: "రూట్ వివరాలు",
+        startNavigation: "నావిగేషన్ ప్రారంభించండి",
+        arrival: "మీరు గమ్యస్థానానికి చేరుకున్నారు!",
+        networkError: "రూట్ దొరకలేదు. ఇంటర్నెట్ మరియు స్థలాలను తనిఖీ చేయండి.",
+        locationDenied: "లొకేషన్ అనుమతి ఇవ్వలేదు. మీరు source మరియు destination చేతితో నమోదు చేయవచ్చు."
+      },
+
+      hi: {
+        selectRoute: "रूट चुनें",
+        fastest: "सबसे तेज़ रूट",
+        shortest: "सबसे छोटा रूट",
+        cheapest: "सबसे सस्ता रूट",
+        recommended: "सुझाया गया",
+        routeReview: "रूट विवरण",
+        startNavigation: "नेविगेशन शुरू करें",
+        arrival: "आप गंतव्य पर पहुँच गए हैं!",
+        networkError: "रूट नहीं मिला। इंटरनेट और स्थान जांचें।",
+        locationDenied: "लोकेशन अनुमति नहीं मिली। आप source और destination खुद दर्ज कर सकते हैं।"
+      }
+    };
+
+    let selectedLanguage = localStorage.getItem("smartroute_language") || "en";
+    let currentUser = null;
+
+    let map;
+    let directionsService;
+    let placesService;
+    let trafficLayer;
+    let originAutocomplete;
+    let destinationAutocomplete;
+
+    let routes = [];
+    let routePolylines = [];
+    let weatherMarkers = [];
+    let selectedRouteIndex = -1;
+    let selectedRoute = null;
+    let destinationLatLng = null;
+
+    let userMarker = null;
+    let locationWatcher = null;
+    let navigationStartedAt = null;
+
+    let trafficVisible = false;
+    let satelliteMode = false;
+    let darkMode = false;
+    let lastRerouteTime = 0;
+
+    const routeColors = [
+      { selected: "#1976f3", inactive: "#94a3b8" },
+      { selected: "#16a34a", inactive: "#a8b5c5" },
+      { selected: "#f97316", inactive: "#a8b5c5" }
+    ];
+
+    const weatherTypes = [
+      { type: "sun", icon: "☀️", label: "Clear / Sunny", needsAlert: false },
+      { type: "rain", icon: "🌧️", label: "Rain possible", needsAlert: true },
+      { type: "cloud", icon: "☁️", label: "Cloudy", needsAlert: false }
+    ];
+
+    /* =========================================================
+       SPLASH, LOGIN, SIGNUP, GUEST, LANGUAGE
+       ========================================================= */
+
+    window.addEventListener("load", function () {
+      setTimeout(function () {
+        document.getElementById("splash").classList.add("hidden");
+
+        const savedSession = JSON.parse(localStorage.getItem("smartroute_session") || "null");
+
+        if (savedSession) {
+          currentUser = savedSession;
+          showLanguagePage();
+        } else {
+          document.getElementById("auth-page").classList.remove("hidden");
+        }
+      }, 1600);
+    });
+
+    function showSignup() {
+      document.getElementById("login-form").classList.add("hidden");
+      document.getElementById("signup-form").classList.remove("hidden");
+    }
+
+    function showLogin() {
+      document.getElementById("signup-form").classList.add("hidden");
+      document.getElementById("login-form").classList.remove("hidden");
+    }
+
+    function signupUser() {
+      const name = document.getElementById("signup-name").value.trim();
+      const email = document.getElementById("signup-email").value.trim().toLowerCase();
+      const password = document.getElementById("signup-password").value;
+
+      if (!name || !email || !password) {
+        showToast("Please enter name, email and password.");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("smartroute_users") || "[]");
+
+      if (users.some(function (user) { return user.email === email; })) {
+        showToast("Account already exists. Please login.");
+        showLogin();
+        return;
+      }
+
+      users.push({ name: name, email: email, password: password });
+      localStorage.setItem("smartroute_users", JSON.stringify(users));
+
+      currentUser = { name: name, email: email, guest: false };
+      localStorage.setItem("smartroute_session", JSON.stringify(currentUser));
+
+      document.getElementById("auth-page").classList.add("hidden");
+      showLanguagePage();
+    }
+
+    function loginUser() {
+      const email = document.getElementById("login-email").value.trim().toLowerCase();
+      const password = document.getElementById("login-password").value;
+
+      const users = JSON.parse(localStorage.getItem("smartroute_users") || "[]");
+      const user = users.find(function (item) {
+        return item.email === email && item.password === password;
+      });
+
+      if (!user) {
+        showToast("Invalid email or password. Create an account or continue as guest.");
+        return;
+      }
+
+      currentUser = { name: user.name, email: user.email, guest: false };
+      localStorage.setItem("smartroute_session", JSON.stringify(currentUser));
+
+      document.getElementById("auth-page").classList.add("hidden");
+      showLanguagePage();
+    }
+
+    function continueAsGuest() {
+      currentUser = { name: "Guest", email: "", guest: true };
+      localStorage.setItem("smartroute_session", JSON.stringify(currentUser));
+
+      document.getElementById("auth-page").classList.add("hidden");
+      showLanguagePage();
+    }
+
+    function showLanguagePage() {
+      document.getElementById("language-page").classList.remove("hidden");
+      chooseLanguage(selectedLanguage);
+    }
+
+    function chooseLanguage(language) {
+      selectedLanguage = language;
+
+      document.querySelectorAll(".language-option").forEach(function (button) {
+        button.classList.toggle("selected", button.dataset.language === language);
+      });
+    }
+
+    function confirmLanguage() {
+      localStorage.setItem("smartroute_language", selectedLanguage);
+
+      document.getElementById("language-page").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+
+      document.getElementById("welcome-name").textContent =
+        "Hi, " + (currentUser ? currentUser.name : "Guest");
+
+      if (window.google && !map) {
+        initMap();
+      }
+    }
+
+    /* =========================================================
+       GOOGLE MAP INITIALIZATION
+       ========================================================= */
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 20.5937, lng: 78.9629 },
+        zoom: 5,
+        disableDefaultUI: true,
+        mapTypeId: "roadmap"
+      });
+
+      directionsService = new google.maps.DirectionsService();
+      placesService = new google.maps.places.PlacesService(map);
+      trafficLayer = new google.maps.TrafficLayer();
+
+      originAutocomplete = new google.maps.places.Autocomplete(
+        document.getElementById("origin-input"),
+        { fields: ["formatted_address", "geometry", "name"] }
+      );
+
+      destinationAutocomplete = new google.maps.places.Autocomplete(
+        document.getElementById("destination-input"),
+        { fields: ["formatted_address", "geometry", "name"] }
+      );
+
+      originAutocomplete.addListener("place_changed", function () {
+        zoomToAutocompletePlace(originAutocomplete);
+      });
+
+      destinationAutocomplete.addListener("place_changed", function () {
+        zoomToAutocompletePlace(destinationAutocomplete);
+      });
+
+      requestInitialLocation();
+    }
+
+    function zoomToAutocompletePlace(autocomplete) {
+      const place = autocomplete.getPlace();
+
+      if (place && place.geometry && place.geometry.location) {
+        map.panTo(place.geometry.location);
+        map.setZoom(14);
+      }
+    }
+
+    function requestInitialLocation() {
+      if (!navigator.geolocation) {
+        showToast("Geolocation is not supported by this browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          updateUserMarker(location);
+          map.setCenter(location);
+          map.setZoom(14);
+        },
+        function () {
+          showToast(textByLanguage[selectedLanguage].locationDenied);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 30000
+        }
+      );
+    }
+
+    function updateUserMarker(location) {
+      if (!map) return;
+
+      if (!userMarker) {
+        userMarker = new google.maps.Marker({
+          position: location,
+          map: map,
+          title: "Your location",
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: "#1976f3",
+            fillOpacity: 1,
+            strokeColor: "#ffffff",
+            strokeWeight: 3,
+            scale: 8
+          },
+          zIndex: 1000
+        });
+      } else {
+        userMarker.setPosition(location);
+      }
+    }
+
+    function goToMyLocation() {
+      if (!navigator.geolocation) {
+        showToast("Location is not supported in this browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          updateUserMarker(location);
+          map.panTo(location);
+          map.setZoom(16);
+        },
+        function () {
+          showToast(textByLanguage[selectedLanguage].locationDenied);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    /* =========================================================
+       SOURCE / DESTINATION AND ROUTE SEARCH
+       ========================================================= */
+
+    function swapLocations() {
+      const source = document.getElementById("origin-input");
+      const destination = document.getElementById("destination-input");
+
+      const temporary = source.value;
+      source.value = destination.value;
+      destination.value = temporary;
+    }
+
+    function calculateRoutes() {
+      if (!directionsService) {
+        showToast("Google Maps is still loading. Please wait.");
+        return;
+      }
+
+      const origin = document.getElementById("origin-input").value.trim();
+      const destination = document.getElementById("destination-input").value.trim();
+
+      if (!origin || !destination) {
+        showToast("Please enter both source and destination.");
+        return;
+      }
+
+      showToast("Finding available routes...");
+
+      clearRouteDisplay();
+
+      document.getElementById("route-panel").innerHTML = "";
+      document.getElementById("continue-btn").disabled = true;
+
+      selectedRouteIndex = -1;
+      selectedRoute = null;
+
+      const request = {
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: true,
+        drivingOptions: {
+          departureTime: new Date()
+        },
+        avoidTolls: document.getElementById("avoid-tolls").checked,
+        avoidHighways: document.getElementById("avoid-highways").checked
+      };
+
+      directionsService.route(request, function (result, status) {
+        if (
+  status !== google.maps.DirectionsStatus.OK ||
+  !result ||
+  !result.routes ||
+  result.routes.length === 0
+) {
+  console.error("Directions API status:", status, result);
+
+  const routeErrors = {
+    ZERO_RESULTS: "No driving route was found between these two locations.",
+    NOT_FOUND: "Source or destination was not found. Select a Google suggestion.",
+    REQUEST_DENIED: "Route request denied. Enable Directions API and check API key restrictions.",
+    OVER_QUERY_LIMIT: "Google Maps request limit reached. Check billing or quota.",
+    MAX_ROUTE_LENGTH_EXCEEDED: "The route is too long or too complex. Try closer locations.",
+    UNKNOWN_ERROR: "Temporary Google Maps error. Please try again."
+  };
+
+  showToast(routeErrors[status] || ("Route error: " + status));
+  return;
+}
+        
+
+        routes = result.routes.slice(0, 3);
+
+        const lastLeg = routes[0].legs[routes[0].legs.length - 1];
+        destinationLatLng = lastLeg.end_location;
+
+        drawAllRouteLines();
+        renderRouteCards();
+        selectRoute(0);
+      });
+    }
+
+    function clearRouteDisplay() {
+      routePolylines.forEach(function (polyline) {
+        polyline.setMap(null);
+      });
+
+      weatherMarkers.forEach(function (marker) {
+        marker.setMap(null);
+      });
+
+      routePolylines = [];
+      weatherMarkers = [];
+    }
+
+    function drawAllRouteLines() {
+      const completeBounds = new google.maps.LatLngBounds();
+
+      routes.forEach(function (route, index) {
+        const polyline = new google.maps.Polyline({
+          path: route.overview_path,
+          strokeColor: routeColors[index].inactive,
+          strokeOpacity: 0.68,
+          strokeWeight: 5,
+          map: map,
+          clickable: true,
+          zIndex: 2
+        });
+
+        polyline.addListener("click", function () {
+          selectRoute(index);
+        });
+
+        routePolylines.push(polyline);
+
+        route.overview_path.forEach(function (point) {
+          completeBounds.extend(point);
+        });
+      });
+
+      map.fitBounds(completeBounds, 55);
+    }
+
+    function renderRouteCards() {
+      const routePanel = document.getElementById("route-panel");
+      routePanel.innerHTML = "";
+
+      const fastestIndex = findFastestRouteIndex();
+      const shortestIndex = findShortestRouteIndex();
+      const cheapestIndex = findCheapestRouteIndex();
+
+      routes.forEach(function (route, index) {
+        const firstLeg = route.legs[0];
+        const weather = getWeatherForRoute(index);
+        const totalCost = calculateRouteCost(route, index);
+        const score = calculateSmartScore(route, index, weather);
+
+        let routeName = getRouteLabel(index);
+
+        const card = document.createElement("article");
+        card.className = "route-card";
+        card.dataset.routeIndex = index;
+        card.onclick = function () {
+          selectRoute(index);
+        };
+
+        const badgeText =
+          index === fastestIndex
+            ? textByLanguage[selectedLanguage].recommended
+            : score + "/100";
+
+        card.innerHTML = `
+          <div class="route-head">
+            <span class="route-name">${routeName}</span>
+            <span class="recommend-badge">${badgeText}</span>
+          </div>
+
+          <div class="route-main">${firstLeg.duration.text}</div>
+
+          <div class="route-meta">
+            <span>${firstLeg.distance.text}</span>
+            <span>₹${totalCost} estimated</span>
+            <span>${index === cheapestIndex ? "Lower cost" : "Route option"}</span>
+          </div>
+
+          <div class="weather-summary">
+            <span class="weather-icon ${getWeatherAnimationClass(weather.type)}">${weather.icon}</span>
+            <b>${weather.label}</b> along this route
+          </div>
+        `;
+
+        routePanel.appendChild(card);
+      });
+    }
+
+    function selectRoute(index) {
+      if (!routes[index]) return;
+
+      selectedRouteIndex = index;
+      selectedRoute = routes[index];
+
+      document.querySelectorAll(".route-card").forEach(function (card) {
+        const cardIndex = Number(card.dataset.routeIndex);
+
+        card.classList.toggle("active", cardIndex === index);
+        card.classList.toggle("dimmed", cardIndex !== index);
+      });
+
+      routePolylines.forEach(function (polyline, polylineIndex) {
+        const isSelected = polylineIndex === index;
+
+        polyline.setOptions({
+          strokeColor: isSelected
+            ? routeColors[polylineIndex].selected
+            : routeColors[polylineIndex].inactive,
+          strokeOpacity: isSelected ? 1 : 0.38,
+          strokeWeight: isSelected ? 8 : 4,
+          zIndex: isSelected ? 10 : 2
+        });
+      });
+
+      showWeatherAnimationsOnSelectedRoute(index);
+
+      const selectedBounds = new google.maps.LatLngBounds();
+
+      selectedRoute.overview_path.forEach(function (point) {
+        selectedBounds.extend(point);
+      });
+
+      map.fitBounds(selectedBounds, 55);
+
+      updateRouteDetails();
+      document.getElementById("continue-btn").disabled = false;
+    }
+
+    /* =========================================================
+       ROUTE WEATHER ANIMATIONS ON SELECTED MAP LINE
+       ========================================================= */
+
+    function getWeatherForRoute(index) {
+      return weatherTypes[index % weatherTypes.length];
+    }
+
+    function getWeatherAnimationClass(type) {
+      if (type === "sun") return "sun-anim";
+      if (type === "rain") return "rain-anim";
+      return "cloud-anim";
+    }
+
+    function showWeatherAnimationsOnSelectedRoute(routeIndex) {
+      weatherMarkers.forEach(function (marker) {
+        marker.setMap(null);
+      });
+
+      weatherMarkers = [];
+
+      const selected = routes[routeIndex];
+      const weather = getWeatherForRoute(routeIndex);
+      const path = selected.overview_path;
+
+      const markerPositions = [
+        path[Math.floor(path.length * 0.33)],
+        path[Math.floor(path.length * 0.66)]
+      ].filter(Boolean);
+
+      markerPositions.forEach(function (position) {
+        const marker = new google.maps.Marker({
+          position: position,
+          map: map,
+          title: weather.label + " on selected route",
+          icon: {
+            url: createWeatherMarkerSvg(weather),
+            scaledSize: new google.maps.Size(46, 46),
+            anchor: new google.maps.Point(23, 23)
+          },
+          zIndex: 30,
+          optimized: false
+        });
+
+        weatherMarkers.push(marker);
+      });
+    }
+
+    function createWeatherMarkerSvg(weather) {
+      let animationStyle = "";
+
+      if (weather.type === "sun") {
+        animationStyle = "animation:rotate 3.5s linear infinite;";
+      } else if (weather.type === "rain") {
+        animationStyle = "animation:moveRain .75s ease-in-out infinite;";
+      } else {
+        animationStyle = "animation:moveCloud 1.8s ease-in-out infinite;";
+      }
+
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46">
+          <foreignObject width="46" height="46">
+            <div xmlns="http://www.w3.org/1999/xhtml"
+              style="width:42px;height:42px;border:2px solid #1976f3;border-radius:50%;
+              display:flex;align-items:center;justify-content:center;background:#fff;
+              box-shadow:0 3px 10px rgba(0,0,0,.3);font-size:25px;">
+              <style>
+                @keyframes rotate { to { transform:rotate(360deg); } }
+                @keyframes moveRain { 50% { transform:translateY(4px); } }
+                @keyframes moveCloud { 50% { transform:translateY(-4px); } }
+              </style>
+              <span style="display:inline-block;${animationStyle}">${weather.icon}</span>
+            </div>
+          </foreignObject>
+        </svg>
+      `;
+
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    /* =========================================================
+       ROUTE ANALYSIS, FUEL, SCORE, DETAILS
+       ========================================================= */
+
+    function getRouteDistanceMeters(route) {
+      return route.legs.reduce(function (total, leg) {
+        return total + leg.distance.value;
+      }, 0);
+    }
+
+    function getRouteDurationSeconds(route) {
+      return route.legs.reduce(function (total, leg) {
+        return total + (leg.duration_in_traffic ? leg.duration_in_traffic.value : leg.duration.value);
+      }, 0);
+    }
+
+    function calculateRouteCost(route, index) {
+      const kilometers = getRouteDistanceMeters(route) / 1000;
+      const vehicle = document.getElementById("vehicle-type").value;
+
+      let costPerKm = 5.2;
+
+      if (vehicle === "bike") costPerKm = 2.4;
+      if (vehicle === "ev") costPerKm = 1.4;
+
+      const toll = index === 1 ? 0 : index === 2 ? 30 : 60;
+
+      return Math.round(kilometers * costPerKm + toll);
+    }
+
+    function calculateSmartScore(route, index, weather) {
+      const durationMinutes = getRouteDurationSeconds(route) / 60;
+      const distanceKilometers = getRouteDistanceMeters(route) / 1000;
+
+      let score = 100;
+      score -= Math.min(25, durationMinutes / 16);
+      score -= Math.min(15, distanceKilometers / 28);
+      score -= index * 2;
+
+      if (weather.needsAlert) score -= 9;
+
+      return Math.max(60, Math.round(score));
+    }
+
+    function findFastestRouteIndex() {
+      return routes.reduce(function (bestIndex, route, index) {
+        return getRouteDurationSeconds(route) < getRouteDurationSeconds(routes[bestIndex])
+          ? index
+          : bestIndex;
+      }, 0);
+    }
+
+    function findShortestRouteIndex() {
+      return routes.reduce(function (bestIndex, route, index) {
+        return getRouteDistanceMeters(route) < getRouteDistanceMeters(routes[bestIndex])
+          ? index
+          : bestIndex;
+      }, 0);
+    }
+
+    function findCheapestRouteIndex() {
+      return routes.reduce(function (bestIndex, route, index) {
+        return calculateRouteCost(route, index) < calculateRouteCost(routes[bestIndex], bestIndex)
+          ? index
+          : bestIndex;
+      }, 0);
+    }
+
+    function getRouteLabel(index) {
+      const fastestIndex = findFastestRouteIndex();
+      const shortestIndex = findShortestRouteIndex();
+      const cheapestIndex = findCheapestRouteIndex();
+
+      if (index === fastestIndex) return textByLanguage[selectedLanguage].fastest;
+      if (index === cheapestIndex) return textByLanguage[selectedLanguage].cheapest;
+      if (index === shortestIndex) return textByLanguage[selectedLanguage].shortest;
+
+      return "Route " + (index + 1);
+    }
+
+    function updateRouteDetails() {
+      if (!selectedRoute) return;
+
+      const firstLeg = selectedRoute.legs[0];
+      const weather = getWeatherForRoute(selectedRouteIndex);
+      const smartScore = calculateSmartScore(selectedRoute, selectedRouteIndex, weather);
+      const estimatedCost = calculateRouteCost(selectedRoute, selectedRouteIndex);
+
+      const roadScore = Math.max(70, smartScore - 3);
+      const safetyScore = Math.max(64, smartScore - (weather.needsAlert ? 12 : 6));
+
+      document.getElementById("selected-route-title").textContent =
+        getRouteLabel(selectedRouteIndex) + " • " + firstLeg.distance.text;
+
+      document.getElementById("road-score").textContent = roadScore + "/100";
+      document.getElementById("safety-score").textContent = safetyScore + "/100";
+      document.getElementById("fuel-cost").textContent = "₹" + estimatedCost;
+
+      document.getElementById("toll-info").textContent =
+        selectedRouteIndex === 1 ? "₹0 assumed" :
+        selectedRouteIndex === 2 ? "₹30 assumed" :
+        "₹60 assumed";
+
+      const weatherAlert = document.getElementById("weather-alert");
+
+      if (weather.needsAlert) {
+        weatherAlert.classList.remove("hidden");
+        document.getElementById("weather-alert-icon").textContent = weather.icon;
+        document.getElementById("weather-alert-text").textContent =
+          "Rain may occur on this route. Drive slowly because roads can be slippery.";
+
+        speakWeatherWarning();
+      } else {
+        weatherAlert.classList.add("hidden");
+      }
+
+      loadNearbyPlaces(firstLeg.end_location);
+    }
+
+    function refreshRouteDetails() {
+      if (!selectedRoute) return;
+
+      renderRouteCards();
+      selectRoute(selectedRouteIndex);
+    }
+
+    function toggleDetailsSheet() {
+      document.getElementById("details-sheet").classList.toggle("open");
+    }
+
+    /* =========================================================
+       NEARBY PLACES
+       ========================================================= */
+
+    function loadNearbyPlaces(location) {
+      if (!placesService || !location) return;
+
+      findNearbyPlaces(location, "hospital", "poi-hospitals");
+      findNearbyPlaces(location, "gas_station", "poi-fuel");
+      findNearbyPlaces(location, "restaurant", "poi-restaurants");
+      findNearbyPlaces(location, "car_repair", "poi-mechanics");
+      findNearbyPlaces(location, "atm", "poi-atms");
+    }
+
+    function findNearbyPlaces(location, type, elementId) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `<div class="poi-card">Loading nearby places...</div>`;
+
+      placesService.nearbySearch(
+        {
+          location: location,
+          radius: 5000,
+          type: type
+        },
+        function (results, status) {
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !results ||
+            results.length === 0
+          ) {
+            element.innerHTML = `
+              <div class="poi-card">
+                <b>No nearby results</b>
+                <span class="muted small">Try another destination.</span>
+              </div>
+            `;
+            return;
+          }
+
+          element.innerHTML = "";
+
+          results.slice(0, 5).forEach(function (place) {
+            const latitude = place.geometry.location.lat();
+            const longitude = place.geometry.location.lng();
+
+            const item = document.createElement("div");
+            item.className = "poi-card";
+
+            item.innerHTML = `
+              <b>${escapeHtml(place.name)}</b>
+              <span class="muted small">${escapeHtml(place.vicinity || "Nearby")}</span>
+              <div style="margin-top:5px;color:#b7791f">⭐ ${place.rating || "N/A"}</div>
+              <button onclick="viewPlaceOnMap(${latitude}, ${longitude}, '${escapeForJs(place.name)}')">View on map</button>
+            `;
+
+            element.appendChild(item);
+          });
+        }
+      );
+    }
+
+    function viewPlaceOnMap(latitude, longitude, name) {
+      document.getElementById("details-sheet").classList.remove("open");
+      map.panTo({ lat: latitude, lng: longitude });
+      map.setZoom(16);
+      showToast(name);
+    }
+
+    /* =========================================================
+       CONTINUE -> ROUTE REVIEW -> START NAVIGATION
+       ========================================================= */
+
+    function openRouteReview() {
+      if (!selectedRoute) {
+        showToast(textByLanguage[selectedLanguage].selectRoute);
+        return;
+      }
+
+      const firstLeg = selectedRoute.legs[0];
+      const weather = getWeatherForRoute(selectedRouteIndex);
+      const routeCost = calculateRouteCost(selectedRoute, selectedRouteIndex);
+
+      openModal(`
+        <button class="close-modal" onclick="closeModal()">×</button>
+
+        <h2>${textByLanguage[selectedLanguage].routeReview}</h2>
+
+        <p class="muted">
+          ${escapeHtml(document.getElementById("origin-input").value)}
+          →
+          ${escapeHtml(document.getElementById("destination-input").value)}
+        </p>
+
+        <div class="stat-grid">
+          <div class="stat-box">
+            <span>Selected route</span>
+            <b>${getRouteLabel(selectedRouteIndex)}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Smart score</span>
+            <b>${calculateSmartScore(selectedRoute, selectedRouteIndex, weather)}/100</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Distance</span>
+            <b>${firstLeg.distance.text}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Travel time</span>
+            <b>${firstLeg.duration.text}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Estimated cost</span>
+            <b>₹${routeCost}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Weather</span>
+            <b>${weather.icon} ${weather.label}</b>
+          </div>
+        </div>
+
+        <div class="alert-box">
+          <span>${weather.icon}</span>
+          <div>
+            <b>Route safety information</b>
+            <div>
+              ${
+                weather.needsAlert
+                  ? "Rain warning: drive slowly and be careful on wet roads."
+                  : "No special weather warning is currently displayed for this route."
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="secondary-btn" onclick="shareRoute(); closeModal()">Share route</button>
+          <button class="secondary-btn" onclick="saveCurrentRoute(); closeModal()">Save route</button>
+        </div>
+
+        <button class="primary-btn full" onclick="startNavigation()">
+          ${textByLanguage[selectedLanguage].startNavigation}
+        </button>
+      `);
+    }
+
+    function startNavigation() {
+      if (!selectedRoute) return;
+
+      closeModal();
+
+      document.body.classList.add("navigation-active");
+      document.getElementById("navigation-panel").classList.add("active");
+
+      navigationStartedAt = new Date();
+
+      const firstLeg = selectedRoute.legs[0];
+
+      document.getElementById("navigation-instruction").textContent =
+        "Follow the highlighted blue route";
+
+      document.getElementById("navigation-next-distance").textContent =
+        "Continue for " + firstLeg.distance.text;
+
+      document.getElementById("navigation-eta").textContent =
+        "ETA " + calculateArrivalTime(getRouteDurationSeconds(selectedRoute));
+
+      document.getElementById("navigation-distance").textContent =
+        firstLeg.distance.text + " remaining";
+
+      document.getElementById("navigation-speed").textContent = "Speed --";
+
+      saveTripToHistory("started");
+      beginLocationTracking();
+
+      speakMessage(
+        selectedLanguage === "te"
+          ? "నావిగేషన్ ప్రారంభమైంది. ఎంచుకున్న రూట్‌ను అనుసరించండి."
+          : selectedLanguage === "hi"
+            ? "नेविगेशन शुरू हो गया है। चुने हुए रूट का पालन करें।"
+            : "Navigation started. Follow the selected route."
+      );
+
+      showToast("Navigation started.");
+    }
+
+    function beginLocationTracking() {
+      if (!navigator.geolocation) {
+        showToast("GPS is not supported by this browser.");
+        return;
+      }
+
+      if (locationWatcher !== null) {
+        navigator.geolocation.clearWatch(locationWatcher);
+      }
+
+      locationWatcher = navigator.geolocation.watchPosition(
+        function (position) {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          updateUserMarker(location);
+          map.panTo(location);
+
+          const speed = position.coords.speed;
+
+          document.getElementById("navigation-speed").textContent =
+            speed !== null && speed >= 0
+              ? "Speed " + Math.round(speed * 3.6) + " km/h"
+              : "Speed unavailable";
+
+          updateRemainingDistance(location);
+          checkIfOffRoute(location);
+        },
+        function () {
+          showToast("Live GPS location is unavailable. Navigation remains in preview mode.");
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 3000,
+          timeout: 10000
+        }
+      );
+    }
+
+    function updateRemainingDistance(currentLocation) {
+      if (!destinationLatLng || !window.google.maps.geometry) return;
+
+      const distance = google.maps.geometry.spherical.computeDistanceBetween(
+        new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+        destinationLatLng
+      );
+
+      document.getElementById("navigation-distance").textContent =
+        formatDistance(distance) + " remaining";
+
+      if (distance < 150) {
+        endNavigation(true);
+      }
+    }
+
+    function checkIfOffRoute(currentLocation) {
+      if (!selectedRoute || !window.google.maps.geometry) return;
+
+      const testPolyline = new google.maps.Polyline({
+        path: selectedRoute.overview_path
+      });
+
+      const nearRoute = google.maps.geometry.poly.isLocationOnEdge(
+        new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+        testPolyline,
+        0.0025
+      );
+
+      if (!nearRoute) {
+        const now = Date.now();
+
+        if (now - lastRerouteTime > 30000) {
+          lastRerouteTime = now;
+          showToast("You may be off route. Recalculating...");
+          rerouteFromCurrentLocation(currentLocation);
+        }
+      }
+    }
+
+    function rerouteFromCurrentLocation(currentLocation) {
+      const destination = document.getElementById("destination-input").value.trim();
+
+      if (!destination) return;
+
+      directionsService.route(
+        {
+          origin: currentLocation,
+          destination: destination,
+          travelMode: google.maps.TravelMode.DRIVING,
+          drivingOptions: {
+            departureTime: new Date()
+          },
+          avoidTolls: document.getElementById("avoid-tolls").checked,
+          avoidHighways: document.getElementById("avoid-highways").checked
+        },
+        function (result, status) {
+          if (status !== "OK" || !result.routes || !result.routes.length) return;
+
+          clearRouteDisplay();
+          routes = [result.routes[0]];
+          selectedRouteIndex = 0;
+          selectedRoute = routes[0];
+
+          destinationLatLng =
+            routes[0].legs[routes[0].legs.length - 1].end_location;
+
+          drawAllRouteLines();
+          renderRouteCards();
+          selectRoute(0);
+
+          document.body.classList.add("navigation-active");
+          document.getElementById("navigation-panel").classList.add("active");
+
+          showToast("Route recalculated successfully.");
+        }
+      );
+    }
+
+    function endNavigation(arrived) {
+      if (locationWatcher !== null) {
+        navigator.geolocation.clearWatch(locationWatcher);
+        locationWatcher = null;
+      }
+
+      document.body.classList.remove("navigation-active");
+      document.getElementById("navigation-panel").classList.remove("active");
+
+      saveTripToHistory(arrived ? "completed" : "ended");
+
+      if (arrived) {
+        speakMessage(textByLanguage[selectedLanguage].arrival);
+        openArrivalSummary();
+      } else {
+        showToast("Navigation ended.");
+      }
+    }
+
+    function openArrivalSummary() {
+      const firstLeg = selectedRoute.legs[0];
+
+      const activeMinutes = navigationStartedAt
+        ? Math.max(1, Math.round((Date.now() - navigationStartedAt.getTime()) / 60000))
+        : 0;
+
+      openModal(`
+        <button class="close-modal" onclick="closeModal(); goHome()">×</button>
+
+        <h2>🎉 ${textByLanguage[selectedLanguage].arrival}</h2>
+        <p class="muted">Your trip has been saved in Trip History.</p>
+
+        <div class="stat-grid">
+          <div class="stat-box">
+            <span>Route</span>
+            <b>${getRouteLabel(selectedRouteIndex)}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Distance</span>
+            <b>${firstLeg.distance.text}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Planned time</span>
+            <b>${firstLeg.duration.text}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Active time</span>
+            <b>${activeMinutes} min</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Estimated cost</span>
+            <b>₹${calculateRouteCost(selectedRoute, selectedRouteIndex)}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Status</span>
+            <b>Completed</b>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Rate your trip (1 to 5)</label>
+          <input id="trip-rating" type="number" min="1" max="5" placeholder="Example: 5" />
+        </div>
+
+        <div class="form-group">
+          <label>Feedback</label>
+          <textarea id="trip-feedback" rows="3" placeholder="How was your route experience?"></textarea>
+        </div>
+
+        <button class="primary-btn full" onclick="saveTripFeedback()">Save feedback and finish</button>
+      `);
+    }
+
+    function saveTripFeedback() {
+      const rating = document.getElementById("trip-rating").value;
+      const feedback = document.getElementById("trip-feedback").value.trim();
+
+      const feedbackList = JSON.parse(
+        localStorage.getItem(getStorageKey("feedback")) || "[]"
+      );
+
+      feedbackList.unshift({
+        rating: rating || "Not given",
+        feedback: feedback,
+        date: new Date().toLocaleString()
+      });
+
+      localStorage.setItem(
+        getStorageKey("feedback"),
+        JSON.stringify(feedbackList)
+      );
+
+      closeModal();
+      goHome();
+      showToast("Thank you. Feedback saved.");
+    }
+
+    /* =========================================================
+       HISTORY, SAVED ROUTES, PROFILE, SETTINGS, LOGOUT
+       ========================================================= */
+
+    function getStorageKey(type) {
+      const userId =
+        (currentUser && (currentUser.email || currentUser.name)) || "guest";
+
+      return "smartroute_" + type + "_" + userId.replace(/[^a-z0-9]/gi, "_");
+    }
+
+    function saveTripToHistory(status) {
+      if (!selectedRoute) return;
+
+      const firstLeg = selectedRoute.legs[0];
+
+      const trip = {
+        id: Date.now(),
+        source: document.getElementById("origin-input").value,
+        destination: document.getElementById("destination-input").value,
+        routeName: getRouteLabel(selectedRouteIndex),
+        distance: firstLeg.distance.text,
+        duration: firstLeg.duration.text,
+        cost: calculateRouteCost(selectedRoute, selectedRouteIndex),
+        status: status,
+        date: new Date().toLocaleString()
+      };
+
+      let trips = JSON.parse(localStorage.getItem(getStorageKey("trips")) || "[]");
+
+      const latestTrip = trips[0];
+
+      if (
+        !latestTrip ||
+        latestTrip.source !== trip.source ||
+        latestTrip.destination !== trip.destination ||
+        latestTrip.status !== trip.status
+      ) {
+        trips.unshift(trip);
+        trips = trips.slice(0, 30);
+
+        localStorage.setItem(getStorageKey("trips"), JSON.stringify(trips));
+      }
+    }
+
+    function openTrips() {
+      setActiveNavigationItem(1);
+
+      const trips = JSON.parse(localStorage.getItem(getStorageKey("trips")) || "[]");
+
+      const content = trips.length
+        ? trips.map(function (trip) {
+            return `
+              <div class="list-item">
+                <b>${escapeHtml(trip.source)} → ${escapeHtml(trip.destination)}</b>
+                <div>${escapeHtml(trip.routeName)} • ${escapeHtml(trip.distance)} • ${escapeHtml(trip.duration)} • ₹${trip.cost}</div>
+                <div class="muted small">${escapeHtml(trip.status)} • ${escapeHtml(trip.date)}</div>
+                <button class="line-btn" onclick="repeatTrip('${escapeForJs(trip.source)}','${escapeForJs(trip.destination)}')">Repeat trip</button>
+                <button class="line-btn" onclick="deleteTrip(${trip.id})">Delete</button>
+              </div>
+            `;
+          }).join("")
+        : `
+          <div class="list-item">
+            No trips yet. Search a route and start navigation to create trip history.
+          </div>
+        `;
+
+      openModal(`
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <h2>🧳 Trip History</h2>
+        <p class="muted">Your planned and completed trips.</p>
+        ${content}
+      `);
+    }
+
+    function repeatTrip(source, destination) {
+      closeModal();
+      goHome();
+
+      document.getElementById("origin-input").value = source;
+      document.getElementById("destination-input").value = destination;
+
+      calculateRoutes();
+    }
+
+    function deleteTrip(id) {
+      let trips = JSON.parse(localStorage.getItem(getStorageKey("trips")) || "[]");
+      trips = trips.filter(function (trip) {
+        return trip.id !== id;
+      });
+
+      localStorage.setItem(getStorageKey("trips"), JSON.stringify(trips));
+      openTrips();
+    }
+
+    function saveCurrentRoute() {
+      if (!selectedRoute) {
+        showToast(textByLanguage[selectedLanguage].selectRoute);
+        return;
+      }
+
+      const source = document.getElementById("origin-input").value;
+      const destination = document.getElementById("destination-input").value;
+
+      let savedRoutes = JSON.parse(
+        localStorage.getItem(getStorageKey("saved")) || "[]"
+      );
+
+      const exists = savedRoutes.some(function (item) {
+        return item.source === source && item.destination === destination;
+      });
+
+      if (!exists) {
+        savedRoutes.unshift({
+          id: Date.now(),
+          source: source,
+          destination: destination,
+          name: source + " → " + destination
+        });
+
+        localStorage.setItem(
+          getStorageKey("saved"),
+          JSON.stringify(savedRoutes)
+        );
+      }
+
+      showToast("Route saved.");
+    }
+
+    function openSavedRoutes() {
+      setActiveNavigationItem(2);
+
+      const savedRoutes = JSON.parse(
+        localStorage.getItem(getStorageKey("saved")) || "[]"
+      );
+
+      const content = savedRoutes.length
+        ? savedRoutes.map(function (item) {
+            return `
+              <div class="list-item">
+                <b>${escapeHtml(item.name)}</b>
+                <button class="line-btn" onclick="repeatTrip('${escapeForJs(item.source)}','${escapeForJs(item.destination)}')">Open route</button>
+                <button class="line-btn" onclick="deleteSavedRoute(${item.id})">Remove</button>
+              </div>
+            `;
+          }).join("")
+        : `
+          <div class="list-item">
+            No saved routes yet. Select a route and use “Save route.”
+          </div>
+        `;
+
+      openModal(`
+        <button class="close-modal" onclick="closeModal()">×</button>
+        <h2>🔖 Saved Routes</h2>
+        <p class="muted">Your favourite and frequently used routes.</p>
+        ${content}
+      `);
+    }
+
+    function deleteSavedRoute(id) {
+      let savedRoutes = JSON.parse(
+        localStorage.getItem(getStorageKey("saved")) || "[]"
+      );
+
+      savedRoutes = savedRoutes.filter(function (item) {
+        return item.id !== id;
+      });
+
+      localStorage.setItem(
+        getStorageKey("saved"),
+        JSON.stringify(savedRoutes)
+      );
+
+      openSavedRoutes();
+    }
+
+    function openProfile() {
+      setActiveNavigationItem(3);
+
+      const trips = JSON.parse(localStorage.getItem(getStorageKey("trips")) || "[]");
+
+      openModal(`
+        <button class="close-modal" onclick="closeModal()">×</button>
+
+        <h2>👤 Profile</h2>
+
+        <div class="list-item">
+          <b>${escapeHtml((currentUser && currentUser.name) || "Guest")}</b>
+          <div class="muted">
+            ${
+              currentUser && currentUser.guest
+                ? "Guest account"
+                : escapeHtml((currentUser && currentUser.email) || "")
+            }
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-box">
+            <span>Total trips</span>
+            <b>${trips.length}</b>
+          </div>
+
+          <div class="stat-box">
+            <span>Language</span>
+            <b>${selectedLanguage.toUpperCase()}</b>
+          </div>
+        </div>
+
+        <button class="secondary-btn full" onclick="closeModal(); openSettings()">Settings</button>
+        <button class="danger-btn full" style="margin-top:10px" onclick="logoutUser()">Logout</button>
+      `);
+    }
+
+    function openSettings() {
+      const currentVehicle = document.getElementById("vehicle-type").value;
+
+      openModal(`
+        <button class="close-modal" onclick="closeModal()">×</button>
+
+        <h2>⚙️ Settings</h2>
+
+        <div class="settings-row">
+          <span>
+            <b>Language</b><br>
+            <small class="muted">Change the app language</small>
+          </span>
+
+          <select onchange="changeLanguageInSettings(this.value)">
+            <option value="en" ${selectedLanguage === "en" ? "selected" : ""}>English</option>
+            <option value="te" ${selectedLanguage === "te" ? "selected" : ""}>తెలుగు</option>
+            <option value="hi" ${selectedLanguage === "hi" ? "selected" : ""}>हिन्दी</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <span>
+            <b>Default vehicle</b><br>
+            <small class="muted">Used for travel-cost estimation</small>
+          </span>
+
+          <select onchange="changeVehicleInSettings(this.value)">
+            <option value="car" ${currentVehicle === "car" ? "selected" : ""}>Car</option>
+            <option value="bike" ${currentVehicle === "bike" ? "selected" : ""}>Bike</option>
+            <option value="ev" ${currentVehicle === "ev" ? "selected" : ""}>EV</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <span>
+            <b>Map style</b><br>
+            <small class="muted">Switch light and dark map</small>
+          </span>
+
+          <button class="secondary-btn" onclick="toggleDarkMap()">Toggle</button>
+        </div>
+
+        <div class="settings-row">
+          <span>
+            <b>Trip history</b><br>
+            <small class="muted">Delete browser-stored trip records</small>
+          </span>
+
+          <button class="danger-btn" onclick="clearTripHistory()">Clear</button>
+        </div>
+
+        <button class="danger-btn full" style="margin-top:18px" onclick="logoutUser()">Logout</button>
+      `);
+    }
+
+    function changeLanguageInSettings(language) {
+      selectedLanguage = language;
+      localStorage.setItem("smartroute_language", language);
+
+      closeModal();
+
+      if (routes.length > 0 && selectedRouteIndex >= 0) {
+        renderRouteCards();
+        selectRoute(selectedRouteIndex);
+      }
+
+      showToast("Language preference saved.");
+    }
+
+    function changeVehicleInSettings(vehicle) {
+      document.getElementById("vehicle-type").value = vehicle;
+      refreshRouteDetails();
+    }
+
+    function clearTripHistory() {
+      localStorage.removeItem(getStorageKey("trips"));
+      closeModal();
+      showToast("Trip history cleared.");
+    }
+
+    function logoutUser() {
+      const confirmLogout = confirm("Are you sure you want to log out?");
+
+      if (!confirmLogout) return;
+
+      if (locationWatcher !== null) {
+        navigator.geolocation.clearWatch(locationWatcher);
+        locationWatcher = null;
+      }
+
+      localStorage.removeItem("smartroute_session");
+
+      currentUser = null;
+
+      closeModal();
+
+      document.body.classList.remove("navigation-active");
+      document.getElementById("navigation-panel").classList.remove("active");
+      document.getElementById("app").classList.add("hidden");
+      document.getElementById("auth-page").classList.remove("hidden");
+
+      document.getElementById("login-email").value = "";
+      document.getElementById("login-password").value = "";
+
+      showLogin();
+    }
+
+    function goHome() {
+      closeModal();
+      setActiveNavigationItem(0);
+
+      document.body.classList.remove("navigation-active");
+      document.getElementById("navigation-panel").classList.remove("active");
+
+      if (selectedRoute) {
+        document.getElementById("details-sheet").classList.remove("open");
+      }
+    }
+
+    function setActiveNavigationItem(index) {
+      document.querySelectorAll(".nav-item").forEach(function (item, itemIndex) {
+        item.classList.toggle("active", itemIndex === index);
+      });
+    }
+
+    /* =========================================================
+       MAP CONTROLS
+       ========================================================= */
+
+    function toggleTraffic() {
+      trafficVisible = !trafficVisible;
+      trafficLayer.setMap(trafficVisible ? map : null);
+
+      showToast(trafficVisible ? "Traffic layer enabled." : "Traffic layer disabled.");
+    }
+
+    function toggleSatellite() {
+      satelliteMode = !satelliteMode;
+      map.setMapTypeId(satelliteMode ? "satellite" : "roadmap");
+    }
+
+    function toggleDarkMap() {
+      darkMode = !darkMode;
+
+      map.setOptions({
+        styles: darkMode
+          ? [
+              { elementType: "geometry", stylers: [{ color: "#1f2937" }] },
+              { elementType: "labels.text.fill", stylers: [{ color: "#d1d5db" }] },
+              { elementType: "labels.text.stroke", stylers: [{ color: "#1f2937" }] },
+              { featureType: "road", elementType: "geometry", stylers: [{ color: "#374151" }] },
+              { featureType: "water", elementType: "geometry", stylers: [{ color: "#0f172a" }] }
+            ]
+          : []
+      });
+
+      showToast(darkMode ? "Dark map enabled." : "Light map enabled.");
+    }
+
+    /* =========================================================
+       VOICE, SOS, SHARE
+       ========================================================= */
+
+    function startVoiceSearch(target) {
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!Recognition) {
+        showToast("Voice search is not supported. Try Google Chrome.");
+        return;
+      }
+
+      const recognition = new Recognition();
+
+      recognition.lang =
+        selectedLanguage === "te" ? "te-IN" :
+        selectedLanguage === "hi" ? "hi-IN" :
+        "en-IN";
+
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      showToast("Listening... speak a location.");
+
+      recognition.onresult = function (event) {
+        const spokenText = event.results[0][0].transcript;
+
+        if (target === "origin") {
+          document.getElementById("origin-input").value = spokenText;
+        } else {
+          document.getElementById("destination-input").value = spokenText;
+        }
+
+        showToast("Location added: " + spokenText);
+      };
+
+      recognition.onerror = function () {
+        showToast("Voice search could not understand. Please type the location.");
+      };
+
+      recognition.start();
+    }
+
+    function speakMessage(message) {
+      if (!("speechSynthesis" in window)) return;
+
+      speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(message);
+
+      utterance.lang =
+        selectedLanguage === "te" ? "te-IN" :
+        selectedLanguage === "hi" ? "hi-IN" :
+        "en-IN";
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakWeatherWarning() {
+      const weather = getWeatherForRoute(selectedRouteIndex);
+
+      if (!weather.needsAlert) return;
+
+      const message =
+        selectedLanguage === "te"
+          ? "ఈ రూట్‌లో వర్షం ఉండవచ్చు. జాగ్రత్తగా డ్రైవ్ చేయండి."
+          : selectedLanguage === "hi"
+            ? "इस रूट पर बारिश हो सकती है। सावधानी से चलाएं।"
+            : "Rain may occur on this route. Please drive carefully.";
+
+      speakMessage(message);
+    }
+
+    function shareRoute() {
+      if (!selectedRoute) {
+        showToast(textByLanguage[selectedLanguage].selectRoute);
+        return;
+      }
+
+      const firstLeg = selectedRoute.legs[0];
+
+      const shareText =
+        "SmartRoute\n" +
+        document.getElementById("origin-input").value +
+        " → " +
+        document.getElementById("destination-input").value +
+        "\n" +
+        getRouteLabel(selectedRouteIndex) +
+        "\nDistance: " +
+        firstLeg.distance.text +
+        "\nTime: " +
+        firstLeg.duration.text +
+        "\nEstimated cost: ₹" +
+        calculateRouteCost(selectedRoute, selectedRouteIndex);
+
+      if (navigator.share) {
+        navigator.share({
+          title: "SmartRoute",
+          text: shareText
+        }).catch(function () {});
+      } else {
+        window.open(
+          "https://wa.me/?text=" + encodeURIComponent(shareText),
+          "_blank"
+        );
+      }
+    }
+
+    function triggerSOS() {
+      const shouldCall = confirm(
+        "Emergency Assistance\n\n" +
+        "Ambulance: 108\n" +
+        "Police: 112\n\n" +
+        "For a real emergency, call your local emergency service immediately.\n\n" +
+        "Press OK to call 108."
+      );
+
+      if (shouldCall) {
+        window.location.href = "tel:108";
+      }
+    }
+
+    /* =========================================================
+       MODAL, TOAST, HELPERS
+       ========================================================= */
+
+    function openModal(content) {
+      document.getElementById("modal-content").innerHTML = content;
+      document.getElementById("modal-backdrop").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("modal-backdrop").classList.add("hidden");
+    }
+
+    document.getElementById("modal-backdrop").addEventListener("click", function (event) {
+      if (event.target.id === "modal-backdrop") {
+        closeModal();
+      }
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(window.toastTimeout);
+
+      window.toastTimeout = setTimeout(function () {
+        toast.classList.remove("show");
+      }, 3200);
+    }
+
+    function calculateArrivalTime(durationSeconds) {
+      const arrival = new Date(Date.now() + durationSeconds * 1000);
+
+      return arrival.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function formatDistance(meters) {
+      return meters >= 1000
+        ? (meters / 1000).toFixed(1) + " km"
+        : Math.round(meters) + " m";
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeForJs(value) {
+      return String(value || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'");
+    }
+  </script>
+
+  <!-- =========================================================
+       ADD YOUR GOOGLE MAPS API KEY BELOW
+       Replace only: PASTE_YOUR_GOOGLE_MAPS_KEY_HERE
+       ========================================================= -->
+  <script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDI4rUPGLVoG-b4-n82GX8OmS3KTzRerxo&libraries=places,geometry&callback=initMap">
+  </script>
+
+</body>
+</html>
